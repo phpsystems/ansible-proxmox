@@ -4,8 +4,13 @@ Ansible scripts for managing proxmox hosts.
 ## Setup
 You will need to install the following ansible roles:
 
-[Proxmox nag removal Role](https://github.com/ironicbadger/ansible-role-proxmox-nag-removal) 
-[Librenms Agent Role](https://github.com/tobias-richter/ansible-librenms-agent)
+* [Proxmox nag removal Role](https://github.com/ironicbadger/ansible-role-proxmox-nag-removal) 
+* [Librenms Agent Role](https://github.com/tobias-richter/ansible-librenms-agent)
+
+Installation can be performed with the following commands:
+
+``ansible-galaxy role install IronicBadger.proxmox_nag_removal``
+``ansible-galaxy role install tobias_richter.librenms_agent``
 
 ## Configuration
 
