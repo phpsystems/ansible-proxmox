@@ -1,0 +1,24 @@
+---
+    - name: "Install supporting packages"
+      ansible.builtin.apt:
+        pkg:
+          - strongswan
+        state: present
+
+# Copy over config file
+    - name: Copy ipsec config file
+      ansible.builtin.copy:
+        src: templates/ipsec.conf
+        dest: /etc/ipsec.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+# Copy over the secrets
+    - name: Copy ipsec config file
+      ansible.builtin.copy:
+        src: templates/ipsec.secrets
+        dest: /etc/ipsec.secrets
+        owner: root
+        group: root
+        mode: '0600'
