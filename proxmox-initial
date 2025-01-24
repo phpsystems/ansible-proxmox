@@ -1,0 +1,103 @@
+---
+- name: "Proxmox Playbook"
+  hosts: proxmox
+  serial: 1   # to avoid updating / breaking everything all at once
+  become: true
+  become_method: sudo
+
+  vars:
+    - librenms_agent_snmp_user: snmpuser
+    - librenms_agent_snmp_password: snmppass
+    - librenms_agent_snmp_encryption: snmppass
+    - librenms_agent_snmp_syslocation: "your location"
+    - librenms_agent_snmp_syscontact: your@email
+
+  pre_tasks:
+
+    - name: Update and Upgrade Aptitude Packages
+      ansible.builtin.apt:
+        update_cache: true
+        upgrade: true
+        cache_valid_time: 86400 # One day
+
+    - name: "Install supporting packages"
+      ansible.builtin.apt:
+        pkg:
+          - mailutils
+          - sudo
+          - acl
+          - tcpdump
+          - traceroute
+          - net-tools
+          - snmpd
+          - lm-sensors
+          - git
+          - lldpd
+          - p7zip-full
+          - numactl
+          - postfix
+          - frr
+          - frr-pythontools
+          - ifupdown2
+          - libpve-network-perl
+          - rsyslog
+          - corosync-qdevice
+        state: present
+
+  roles:
+    - role: tobias_richter.librenms_agent
+      librenms_agent_snmp_extensions:
+        - name: osupdate
+          script: osupdate
+          comment: enable os updates in librenms
+        - name: ".1.3.6.1.4.1.2021.7890.1 distro"
+          script: distro
+          comment: enable distribution
+        - name: ntp-client
+          script: ntp-client
+          comment: enable ntp-client stats for librenms
+      librenms_agent_check_mk_extensions:
+        - script: dpkg
+        - script: proxmox
+      tags: librenmsagent
+
+    - role: ironicbadger.proxmox-nag-removal
+      tags: roleremoval
+      notify: Update Apt
+
+  post_tasks:
+    - name: Enable mail relaying
+      lineinfile: >
+        dest=/etc/postfix/main.cf
+        regexp="(?i)^\\s*relayhost\\b"
+        insertafter="(?i)^#\\s*relayhost\\b"
+        line="relayhost = 10.10.0.11"
+      notify: Reload Postfix
+
+    - include_tasks: tasks/strongswan-tasks.yaml
+    - include_tasks: tasks/dnsmasq-tasks.yaml
+    - include_tasks: tasks/gpsd-tasks.yaml
+    - include_tasks: tasks/chrony-tasks.yaml
+
+  handlers:
+
+    - name: Update Apt
+      ansible.builtin.apt:
+        update_cache: true
+        upgrade: true
+        cache_valid_time: 86400 # One day
+
+    - name: Reload Postfix
+      service:
+        name: postfix
+        state: reloaded
+
+    - name: Restart GPSD
+      service:
+        name: gpsd
+        state: restarted
+
+    - name: Restart chronyd
+      service:
+        name: chronyd
+        state: restarted
