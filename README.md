@@ -4,7 +4,7 @@ Ansible scripts for managing proxmox hosts.
 ## Setup
 You will need to install the following ansible roles:
 
-[Proxmox nag removal https://github.com/ironicbadger/ansible-role-proxmox-nag-removal]
+[https://github.com/ironicbadger/ansible-role-proxmox-nag-removal Proxmox nag removal]
 
 ## Configuration
 
