@@ -1,0 +1,12 @@
+---
+    - name: "Install supporting packages"
+      ansible.builtin.apt:
+        pkg:
+          - dnsmasq
+        state: present
+
+    - name: "Disable DNSMasq"
+      service:
+        name: "dnsmasq"
+        state: stopped
+        enabled: false
