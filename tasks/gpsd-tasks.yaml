@@ -1,0 +1,28 @@
+---
+    - name: "Install supporting packages"
+      ansible.builtin.apt:
+        pkg:
+          - gpsd
+          - pps-tools
+        state: present
+
+    - name: Configure Devices
+      lineinfile: 
+        dest: /etc/default/gpsd
+        search_string: "DEVICES="
+        line: "DEVICES=/dev/ttyACM0"
+      notify: Restart GPSD
+
+    - name: Configure Devices
+      lineinfile: 
+        dest: /etc/default/gpsd
+        search_string: "GPSD_OPTIONS="
+        line: "GPSD_OPTIONS=\"-n -b -s 4800\""
+      notify: Restart GPSD
+
+    - name: Configure USBAUTO
+      lineinfile: 
+        dest: /etc/default/gpsd
+        search_string: "USBAUTO="
+        line: "USBAUTO=\"true\""
+      notify: Restart GPSD
