@@ -1,0 +1,50 @@
+---
+    - name: "Install supporting packages"
+      ansible.builtin.apt:
+        pkg:
+          - chrony
+        state: present
+
+    # Disable the debian pool.
+
+    - name: Disable debian pool
+      replace: 
+        dest: /etc/chrony/chrony.conf
+        regexp: '^pool'
+        replace: "#pool "
+      notify: Restart chronyd
+
+    # Add local network sources
+
+    - name: Add PVE Time Source - Firewall
+      lineinfile: 
+        dest: /etc/chrony/sources.d/firewall.sources
+        line: "peer 192.168.0.1 iburst"
+        create: yes
+      notify: Restart chronyd
+
+       # Add the GPS based sources
+
+    - name: Add PVE Time Source - LocalGPS
+      lineinfile: 
+        dest: /etc/chrony/conf.d/GPS-01.conf
+        line: "refclock SHM 0 refid GPS precision 1e-1 offset 0.128 delay 0.2"
+        create: yes
+      notify: Restart chronyd
+
+    # Fix who is allowed to query the service.
+
+    - name: Allow Localhost
+      lineinfile: 
+        dest: /etc/chrony/conf.d/allow-localhost.conf
+        line: "allow 127.0.0.0/8"
+        create: yes
+      notify: Restart chronyd
+
+    - name: Allow Lan
+      lineinfile: 
+        dest: /etc/chrony/conf.d/allow-lan.conf
+        line: "allow 192.168.42.0/24"
+        create: yes
+      notify: Restart chronyd
+
