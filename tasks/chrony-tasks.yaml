@@ -44,7 +44,7 @@
     - name: Allow Lan
       lineinfile: 
         dest: /etc/chrony/conf.d/allow-lan.conf
-        line: "allow 192.168.42.0/24"
+        line: "allow 192.168.0.0/24"
         create: yes
       notify: Restart chronyd
 
