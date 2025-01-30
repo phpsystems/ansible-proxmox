@@ -19,3 +19,6 @@ Your will need to place your own key in templates/ipsec.secrets. The key can be 
 
 The vars section of the proxmox-initial.yaml will need to be changed for your snmp settings, as you have configured for Librenms.
 
+## Blog Post
+
+The corresponding blog post for this repository can be found here: [PHP-systems.com Blog](https://blog.php-systems.com/proxmox-host-management-with-ansible/)
